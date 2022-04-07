@@ -4,6 +4,7 @@ import re
 from .Article import Article
 #from Article import Article #for testing seperately 
 URL = 'https://moxie.foxnews.com/feedburner/latest.xml'
+#TODO: combine with cnnScraper
 
 def loadRSS():
     return urlopen(URL)
@@ -70,8 +71,8 @@ def parseXML(respHTML):
 #sure a proper category was recorded. 
 def processURL(url):
     splitURL = url.split("/")
-    print("split: ", splitURL)
-    print("split length: ", len(splitURL))
+    #print("split: ", splitURL)
+    #print("split length: ", len(splitURL))
     if len(splitURL) == 5:
         category = splitURL[3]
         return category
@@ -134,7 +135,7 @@ def getArticles():
     articles = parseXML(loadRSS())
     #printXMLtree(parse(loadRSS()))
     #betterPrint(parse(loadRSS()))
-    printParsedArticles(articles)
+    #printParsedArticles(articles)
     #return parseXML(loadRSS())
     return articles
 

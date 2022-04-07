@@ -6,7 +6,7 @@ import re
 from .Article import Article
 URL = 'http://rss.cnn.com/rss/cnn_latest.rss'
 # Scrapes a list of articles from an rss feed
-
+#TODO: combine with foxScraper
 def loadRSS():
     return urlopen(URL)
 
