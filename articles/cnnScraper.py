@@ -4,6 +4,8 @@ import re
 #from filter import filterString
 #from pprint import pprint
 from .Article import Article
+#from Article import Article #for testing seperately 
+from categories import cnn_categories
 URL = 'http://rss.cnn.com/rss/cnn_latest.rss'
 # Scrapes a list of articles from an rss feed
 #TODO: combine with foxScraper
@@ -32,12 +34,14 @@ def parseXML(respHTML):
         else:
             continue
 
+        category_set = set()
         link = item.findtext('link')
         if link:
             article["url"] = str(link)
             category = processURL(str(link))
             if category:
-                article["category"] = category
+                category_set.add(category)
+                article["categories"] = category_set
             else:
                 continue
         else:
@@ -62,13 +66,18 @@ def parseXML(respHTML):
     #TODO: Tokenize Titles, Descriptions too? 
 
 #extracts the category from the article's url 
-#TODO: make this safer: could easily break if url's change,
+#TODO: make this safer: could easily break if url's change, doesn't work for travel
+#articles for example
 #check category against list of valid category names to make 
 #sure a proper category was recorded. 
 def processURL(url):
     splitURL = url.split("/")
+    category = ""
     if len(splitURL) == 9:
         category = splitURL[6]
+    elif len(splitURL) == 7:
+        category = splitURL[3]
+    if category in cnn_categories:
         return category
     return
 
@@ -118,6 +127,8 @@ def getArticles():
     #printParsedArticles(articles)
     #return parseXML(loadRSS())
     return articles
+
+#printXMLtree(parse(loadRSS()))
 '''
 articles = getArticles()
 printParsedArticles(articles)

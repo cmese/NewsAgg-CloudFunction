@@ -1,14 +1,14 @@
 #TODO: convert to data class 
 class Article(object):
     def __init__(self, title, date, description,
-            url, imageURL, publisher, category):
+            url, imageURL, publisher, categories):
         self.title = title
         self.date = date
         self.description = description
         self.url = url
         self.imageURL = imageURL
         self.publisher = publisher
-        self.category = category
+        self.categories = categories
 
     @staticmethod
     def from_dict(source):
@@ -19,7 +19,7 @@ class Article(object):
             source[u'url'],
             source[u'imageURL'],
             source[u'publisher'],
-            source[u'category']
+            set(source[u'categories'])
         )
         return article
 
@@ -31,7 +31,7 @@ class Article(object):
             u'url' : self.url,
             u'imageURL' : self.imageURL,
             u'publisher' : self.publisher,
-            u'category' : self.category
+            u'categories' : list(self.categories)
         }
         return dest
 
@@ -47,6 +47,6 @@ class Article(object):
             f'\turl={self.url}\n'
             f'\timageURL={self.imageURL}\n'
             f'\tpublisher={self.publisher}\n'
-            f'\tcategory={self.category}\n'
+            f'\tcategories={self.categories}\n'
             f'    )'
         )

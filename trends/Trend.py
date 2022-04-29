@@ -3,21 +3,21 @@
 from articles.Article import Article
 
 class Trend(object):
-    def __init__(self, name, category, articles=[]):
+    def __init__(self, name, categories, articles=[]): #TODO: default empty list can cause weird errors, change this 
         self.name = name
-        self.category = category
+        self.categories = categories
         self.articles = articles
 
     @staticmethod
     def from_dict(source):
         article_object_list = [Article.from_dict(article) for article in source[u'articles']]
-        return Trend(source[u'name'], source[u'category'], article_object_list)
+        return Trend(source[u'name'], set(source[u'categories']), article_object_list)
 
     def to_dict(self):
         article_dict_list = [article.to_dict() for article in self.articles]
         dest = {
             u'name': self.name,
-            u'category': self.category,
+            u'categories': list(self.categories),
             u'articles': article_dict_list
         }
         return dest
@@ -29,7 +29,7 @@ class Trend(object):
         return(
             f'\nTREND(\n'
                 f'  name={self.name}\n'
-                f'  category={self.category}\n'
+                f'  categories={self.categories}\n'
                 f'  articles={self.articles}\n'
             f')'
         )

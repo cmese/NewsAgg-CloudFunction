@@ -3,8 +3,11 @@ from xml.etree.ElementTree import parse
 import re
 from .Article import Article
 #from Article import Article #for testing seperately 
+from categories import fox_categories
 URL = 'https://moxie.foxnews.com/feedburner/latest.xml'
 #TODO: combine with cnnScraper
+DOMAIN_1="foxnews.com/taxonomy"
+DOMAIN_2="foxnews.com/section-path"
 
 def loadRSS():
     return urlopen(URL)
@@ -32,14 +35,23 @@ def parseXML(respHTML):
         else:
             continue
 
+        category_set = set()
+        for categoryTag in item.findall('category'):
+            domain = categoryTag.get('domain')
+            if domain == DOMAIN_1 or DOMAIN_2:
+                category = processCategory(categoryTag.text)
+                if category:
+                    category_set.add(category)
+        article["categories"] = category_set
+
         link = item.findtext('link')
         if link:
             article["url"] = str(link)
-            category = processURL(str(link))
-            if category:
-                article["category"] = category
-            else:
-                continue
+            #category = processURL(str(link))
+            #if category:
+            #    article["category"] = category
+            #else:
+            #    continue
         else:
             continue
 
@@ -77,6 +89,14 @@ def processURL(url):
         category = splitURL[3]
         return category
     return
+
+def processCategory(category):
+    split_category = category.split("/")
+    if split_category[1] in fox_categories:
+        return category
+    return
+
+
 
 # helper to print specific elements from parsed xmlTree to console
 def printFullParsedTree(xmlTree):
@@ -139,8 +159,8 @@ def getArticles():
     #return parseXML(loadRSS())
     return articles
 
-'''
 articles = getArticles()
+'''
 printParsedArticles(articles)
 print("number of articles: ", len(articles))
 print("bytes: ", sys.getsizeof(articles))
