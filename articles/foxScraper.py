@@ -3,7 +3,7 @@ from xml.etree.ElementTree import parse
 import re
 from .Article import Article
 #from Article import Article #for testing seperately 
-from categories import fox_categories
+from .categories import fox_categories
 URL = 'https://moxie.foxnews.com/feedburner/latest.xml'
 #TODO: combine with cnnScraper
 DOMAIN_1="foxnews.com/taxonomy"
@@ -38,7 +38,7 @@ def parseXML(respHTML):
         category_set = set()
         for categoryTag in item.findall('category'):
             domain = categoryTag.get('domain')
-            if domain == DOMAIN_1 or DOMAIN_2:
+            if (domain == DOMAIN_1) or (domain == DOMAIN_2):
                 category = processCategory(categoryTag.text)
                 if category:
                     category_set.add(category)
@@ -91,9 +91,10 @@ def processURL(url):
     return
 
 def processCategory(category):
+    print(category)
     split_category = category.split("/")
     if split_category[1] in fox_categories:
-        return category
+        return fox_categories[split_category[1]]
     return
 
 

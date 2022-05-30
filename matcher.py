@@ -21,7 +21,6 @@ def match(articles, trends):
             jacScore = getJaccardScore(trend_tokens, article_tokens)
             if jacScore > 0:
                 matched_articles.append(article)
-        #to get the category, loop through the articles categories and get the most matched one 
         if matched_articles:
             category_set = combineCategories(matched_articles)
             matched_trend = Trend(name=trend, categories=category_set, articles=matched_articles)

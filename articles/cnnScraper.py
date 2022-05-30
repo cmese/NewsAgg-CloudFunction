@@ -5,7 +5,7 @@ import re
 #from pprint import pprint
 from .Article import Article
 #from Article import Article #for testing seperately 
-from categories import cnn_categories
+from .categories import cnn_categories
 URL = 'http://rss.cnn.com/rss/cnn_latest.rss'
 # Scrapes a list of articles from an rss feed
 #TODO: combine with foxScraper
@@ -78,7 +78,7 @@ def processURL(url):
     elif len(splitURL) == 7:
         category = splitURL[3]
     if category in cnn_categories:
-        return category
+        return cnn_categories[category]
     return
 
 # helper to print specific elements from parsed xmlTree to console
