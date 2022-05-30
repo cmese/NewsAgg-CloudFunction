@@ -3,7 +3,14 @@ from trends.gTrends import getDailyTrends
 from articles.mainScraper import scrape
 from matcher import match
 from trends.Trend import Trend
-#from scraperURLs import urlDic
+# from scraperURLs import urlDic
+
+# This os import solves weird DNS error:
+'''
+google.api_core.exceptions.RetryError: Deadline of 300.0s exceeded while calling target function, last exception: 503 DNS resolution failed for firestore.googleapis.com: C-ares status is not ARES_SUCCESS qtype=AAAA name=firestore.googleapis.com is_balancer=0: Could not contact DNS servers
+'''
+import os
+os.environ['GRPC_DNS_RESOLVER'] = 'native'
 
 
 class TrendsAgg(object):
@@ -35,18 +42,19 @@ def main():
     db = firestore.Client()
     trendsAgg_doc_ref = db.collection(u'trendsAgg').document(u'recentTrends')
     doc_dict = trendsAgg_doc_ref.get().to_dict()
-    #print("\ndoc_dict:\n", doc_dict)
+    # doc_dict = trendsAgg_doc_ref.get()
+    # print("\ndoc_dict:\n", doc_dict)
     if doc_dict:
         temp_dic = {}
         trends_agg = TrendsAgg.from_dict(doc_dict)
         last500_list = trends_agg.last500
-        #last500_list = doc_dict['last500']
+        # last500_list = doc_dict['last500']
         articles = scrape()
         if last500_list and articles:
-            #print("Last500_list before anything happens:\n", last500_list)
+            # print("Last500_list before anything happens:\n", last500_list)
             for trend in last500_list:
-                #prevTrend = Trend.from_dict(trend)
-                #temp_dic[prevTrend.name] = prevTrend
+                # prevTrend = Trend.from_dict(trend)
+                # temp_dic[prevTrend.name] = prevTrend
                 temp_dic[trend.name] = trend
         else:
             return
@@ -54,8 +62,8 @@ def main():
         for google_trend in getDailyTrends():
             temp_dic.setdefault(google_trend)
 
-        #print("Scraped articles:\n", articles)
-        #print("Temp_dic (previous trends + current google trends before matching): \n", temp_dic)
+        # print("Scraped articles:\n", articles)
+        # print("Temp_dic (previous trends + current google trends before matching): \n", temp_dic)
 
         matchedTrends = match(articles, temp_dic.keys())  # change this to trends, not just keys. otherwise you can lose old articles when matching very old previous trends. which could move the popped trend bit to the matcher function....or do we actually wanna do this? An old trend might have the same trend name but not necessarily be about the same thing so the articles might be different......hmmmmm maybe we shouuld just keep this like so
         #print('matched trends:\n', matchedTrends)
@@ -100,15 +108,15 @@ def main():
         print(
             "Last500_list BEFORE repacking for firestore:\n",
             trends_agg,
-            "\n\n")
+            "\n\n"
+        )
         #print("Last500_list AFTER repacking for firestore:\n", trends_agg.to_dict())
         '''
         trendsAgg_doc_ref.set({
             u'last500': last500_list
         })
         '''
-        # trendsAgg_doc_ref.set(trends_agg.to_dict())
-
+        #trendsAgg_doc_ref.set(trends_agg.to_dict())
 
 if __name__ == "__main__":
     main()
