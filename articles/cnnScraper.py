@@ -59,17 +59,15 @@ def parseXML(respHTML):
         except:
             continue
         articles.append(Article.from_dict(article))
-        #articles.append(article)
     return articles
 
-#TODO: Sorensen-Dice to get torken scores for grouping
-    #TODO: Tokenize Titles, Descriptions too? 
+# TODO: Sorensen-Dice to get torken scores for grouping
+    # TODO: Tokenize Titles, Descriptions too?
 
-#extracts the category from the article's url 
-#TODO: make this safer: could easily break if url's change, doesn't work for travel
-#articles for example
-#check category against list of valid category names to make 
-#sure a proper category was recorded. 
+# extracts the category from the article's url
+# TODO: make this safer: could easily break if url's change, doesn't work for travel articles for example
+# check category against list of valid category names to make
+# sure a proper category was recorded.
 def processURL(url):
     splitURL = url.split("/")
     category = ""

@@ -27,7 +27,6 @@ def parseXML(respHTML):
         else:
             continue
 
-        #description = re.match(r'.+?(?=<)', str(item.findtext('description')))
         description = item.findtext('description')
         if description:
             article["description"] = str(description)
@@ -47,11 +46,6 @@ def parseXML(respHTML):
         link = item.findtext('link')
         if link:
             article["url"] = str(link)
-            #category = processURL(str(link))
-            #if category:
-            #    article["category"] = category
-            #else:
-            #    continue
         else:
             continue
 
@@ -74,29 +68,27 @@ def parseXML(respHTML):
         articles.append(Article.from_dict(article))
     return articles
 
-#TODO: Sorensen-Dice to get torken scores for grouping
-    #TODO: Tokenize Titles, Descriptions too? 
+# TODO: Sorensen-Dice to get torken scores for grouping
+    # TODO: Tokenize Titles, Descriptions too?
 
-#extracts the category from the article's url 
-#TODO: make this safer: could easily break if url's change,
-#check category against list of valid category names to make 
-#sure a proper category was recorded. 
+# extracts the category from the article's url
+# TODO: make this safer: could easily break if url's change,
+# check category against list of valid category names to make
+# sure a proper category was recorded.
 def processURL(url):
     splitURL = url.split("/")
-    #print("split: ", splitURL)
-    #print("split length: ", len(splitURL))
     if len(splitURL) == 5:
         category = splitURL[3]
         return category
     return
 
+
 def processCategory(category):
-    print(category)
+    # print(category)
     split_category = category.split("/")
     if split_category[1] in fox_categories:
         return fox_categories[split_category[1]]
     return
-
 
 
 # helper to print specific elements from parsed xmlTree to console

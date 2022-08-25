@@ -10,7 +10,7 @@ def getJaccardScore(str1_tokens, str2_tokens):
     return float(len(c)) / (len(a) + len(b) - len(c))
 
 
-#returns a list of matched Trend objects
+# returns a list of matched Trend objects
 def match(articles, trends):
     result_list = []
     for trend in trends:
@@ -28,9 +28,9 @@ def match(articles, trends):
     return result_list
 
 
-#takes all article categories from article list
-#and converts it to either sports, politics, business, health 
-#example: baseball -> sports, covid -> health, stocks -> business  
+# takes all article categories from article list
+# and converts it to either sports, politics, business, health
+# example: baseball -> sports, covid -> health, stocks -> business
 def combineCategories(articles):
     categories = set()
     for article in articles:
