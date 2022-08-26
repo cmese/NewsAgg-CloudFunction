@@ -1,13 +1,17 @@
+import feedparser
+from rssLinks import rssDic
 from urllib.request import urlopen
 from xml.etree.ElementTree import parse
 import re
-from .Article import Article
-#from Article import Article #for testing seperately 
-from .categories import fox_categories
+# from .Article import Article
+from Article import Article #for testing seperately
+# from .categories import fox_categories
+from categories import fox_categories
 URL = 'https://moxie.foxnews.com/feedburner/latest.xml'
-#TODO: combine with cnnScraper
-DOMAIN_1="foxnews.com/taxonomy"
-DOMAIN_2="foxnews.com/section-path"
+# TODO: combine with cnnScraper
+DOMAIN_1 = "foxnews.com/taxonomy"
+DOMAIN_2 = "foxnews.com/section-path"
+
 
 def loadRSS():
     return urlopen(URL)
@@ -83,13 +87,19 @@ def processURL(url):
     return
 
 
-def processCategory(category):
+def processCategoryOld(category):
     # print(category)
     split_category = category.split("/")
     if split_category[1] in fox_categories:
         return fox_categories[split_category[1]]
     return
 
+def processCategory(category):
+    split_category = category.split("/")
+    if split_category[0] == "fox-news":
+        if split_category[1] in fox_categories:
+            return fox_categories[split_category[1]]
+    return
 
 # helper to print specific elements from parsed xmlTree to console
 def printFullParsedTree(xmlTree):
@@ -144,15 +154,53 @@ def printParsedArticles(articles):
         print("\n")
 
 
-def getArticles():
-    articles = parseXML(loadRSS())
+def getArticlesOld():
+    articles = []
+    for url in rssDic['fox']:
+        articles.append(parseXML(loadRSS()))
     #printXMLtree(parse(loadRSS()))
     #betterPrint(parse(loadRSS()))
     #printParsedArticles(articles)
     #return parseXML(loadRSS())
     return articles
 
-articles = getArticles()
+def processURL(url):
+    splitURL = url.split("/")
+    if len(splitURL) == 5:
+        category = splitURL[3]
+        return category
+    return
+
+def getArticles():
+    articles = []
+    for url in rssDic['fox']:
+        feed = feedparser.parse(url)
+        #print(feed.entries[0].tags)
+        for item in feed.entries:
+            article = {}
+            try:
+                article["publisher"] = "cnn"
+                article["title"] = item.title
+                article["date"] = item.published
+                article["description"] = item.summary
+                article["imageURL"] = item.media_content[0]['url']
+                article["url"] = item.link
+                category_set = set()
+                for category in item.tags:
+                    category = processCategory(category.term)
+                    if category:
+                        category_set.add(category)
+                if (category_set is set()):
+                    continue
+                article["categories"] = category_set
+            except (AttributeError, KeyError):
+                continue
+            articles.append(Article.from_dict(article))
+    return [*set(articles)]  # removes duplicates
+
+
+print(getArticles())
+#print(getArticles())
 '''
 printParsedArticles(articles)
 print("number of articles: ", len(articles))

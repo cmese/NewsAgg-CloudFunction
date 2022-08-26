@@ -118,5 +118,6 @@ def main():
         '''
         #trendsAgg_doc_ref.set(trends_agg.to_dict())
 
+
 if __name__ == "__main__":
     main()

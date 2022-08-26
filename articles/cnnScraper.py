@@ -1,18 +1,69 @@
+import feedparser
+from rssLinks import rssDic
 from urllib.request import urlopen
 from xml.etree.ElementTree import parse
 import re
-#from filter import filterString
-#from pprint import pprint
-from .Article import Article
-#from Article import Article #for testing seperately 
-from .categories import cnn_categories
+# from filter import filterString
+# from pprint import pprint
+# from .Article import Article
+from Article import Article  # for testing seperately
+# from .categories import cnn_categories
+from categories import cnn_categories
 URL = 'http://rss.cnn.com/rss/cnn_latest.rss'
+
+
+def getArticles():
+    articles = []
+    for url in rssDic['cnn']:
+        feed = feedparser.parse(url)
+        print(feed.entries[0].keys())
+        for item in feed.entries:
+            article = {}
+            try:
+                article["publisher"] = "cnn"
+                article["title"] = item.title
+                article["date"] = item.published
+                article["description"] = item.summary
+                article["imageURL"] = item.media_content[0]['url']
+                article["url"] = item.link
+                categories = getCategories(item.link)
+                if (categories is set()):  # if empty
+                    continue
+                article["categories"] = categories
+            except (AttributeError, KeyError):
+                continue
+            articles.append(Article.from_dict(article))
+    return [*set(articles)]  # removes duplicates
+
+def getCategories(link):
+    categories = set()
+    category = processURL(link)
+    if category:
+        categories.add(category)
+    return categories
+
+
+# extracts the category from the article's url
+# TODO: make this safer: could easily break if url's change, doesn't work for travel articles for example
+def processURL(url):
+    splitURL = url.split("/")
+    category = ""
+    if len(splitURL) == 9:
+        category = splitURL[6]
+    elif len(splitURL) == 7:
+        category = splitURL[3]
+
+    if category in cnn_categories:
+        return cnn_categories[category]
+    return category
+
+
 # Scrapes a list of articles from an rss feed
-#TODO: combine with foxScraper
 def loadRSS():
     return urlopen(URL)
 
-#Parses xml for articles that have a title, description, link, date, and url
+
+# Parses xml for articles that have a title, description, link, date, and url
 def parseXML(respHTML):
     respXML = parse(respHTML)
     articles = []
@@ -64,21 +115,6 @@ def parseXML(respHTML):
 # TODO: Sorensen-Dice to get torken scores for grouping
     # TODO: Tokenize Titles, Descriptions too?
 
-# extracts the category from the article's url
-# TODO: make this safer: could easily break if url's change, doesn't work for travel articles for example
-# check category against list of valid category names to make
-# sure a proper category was recorded.
-def processURL(url):
-    splitURL = url.split("/")
-    category = ""
-    if len(splitURL) == 9:
-        category = splitURL[6]
-    elif len(splitURL) == 7:
-        category = splitURL[3]
-    if category in cnn_categories:
-        return cnn_categories[category]
-    return
-
 # helper to print specific elements from parsed xmlTree to console
 def printFullParsedTree(xmlTree):
     for item in xmlTree.iterfind('./channel/item'):
@@ -120,7 +156,7 @@ def printParsedArticles(articles):
         print("\n")
 
 
-def getArticles():
+def getArticlesOld():
     articles = parseXML(loadRSS())
     #printParsedArticles(articles)
     #return parseXML(loadRSS())
@@ -144,6 +180,8 @@ print("bytes: ", sys.getsizeof(articles))
     #get the max score and see if its greater then a threshold 
         #if its greater, store that article[i] under that keyword
         #if its less, store the article in the "other" keyword/category 
+
+getArticles()
 
 
 

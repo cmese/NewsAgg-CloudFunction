@@ -1,13 +1,12 @@
 '''
-The main scraper that calls all of the
-other different types of RSS scrapers from
-the different news organizations in one function
+The 'master' scraper
 '''
 # from .cnnScraper import getCNNArticles
-from . import cnnScraper, foxScraper
+from . import cnnScraper, foxScraper, nytScraper
 
 
 def scrape():
     cnnArticles = cnnScraper.getArticles()
     foxArticles = foxScraper.getArticles()
-    return cnnArticles + foxArticles
+    nytArticles = nytScraper.getArticles()
+    return [cnnArticles + nytArticles + foxArticles]

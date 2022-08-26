@@ -28,9 +28,8 @@ class Trend(object):
     def __repr__(self):
         return(
             f'\nTREND(\n'
-                f'  name={self.name}\n'
-                f'  categories={self.categories}\n'
-                f'  articles={self.articles}\n'
+            f'  name={self.name}\n'
+            f'  categories={self.categories}\n'
+            f'  articles={self.articles}\n'
             f')'
         )
-
