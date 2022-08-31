@@ -44,11 +44,14 @@ def processURL(url):
         return category
     return
 
+# TODO: processCategory
+'''
 def processCategory(category):
     split_category = category.split("/")
     if split_category[0] == "fox-news":
         if split_category[1] in fox_categories:
             return fox_categories[split_category[1]]
     return
+'''
 
 print(getArticles())
