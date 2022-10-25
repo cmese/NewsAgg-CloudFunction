@@ -3,7 +3,9 @@ URLs for RSS feeds from each news website
 """
 
 rssDic = {
-    'cnbc': ['https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114'], # does not have images
+    'bbc': ['http://feeds.bbci.co.uk/news/rss.xml'], # missing images
+
+    'cnbc': ['https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114'], # missing images
 
     'cnn': ['http://rss.cnn.com/rss/cnn_topstories.rss',
             'http://rss.cnn.com/rss/cnn_world.rss',

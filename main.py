@@ -1,6 +1,6 @@
 from google.cloud import firestore
 from trends.gTrends import getDailyTrends
-from articles.mainScraper import scrape
+from mainScraper import scrape
 from matcher import match
 from trends.Trend import Trend
 # from scraperURLs import urlDic

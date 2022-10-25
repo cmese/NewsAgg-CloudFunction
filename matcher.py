@@ -18,6 +18,7 @@ def match(articles, trends):
         matched_articles = []
         for article in articles:
             article_tokens = filterString(article.title)
+            article_tokens = article_tokens
             jacScore = getJaccardScore(trend_tokens, article_tokens)
             if jacScore > 0:
                 matched_articles.append(article)

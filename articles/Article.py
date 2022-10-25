@@ -45,11 +45,14 @@ class Article(object):
         return(
             f'\n    Article(\n'
             f'\t\ttitle={self.title}\n'
-            # f'\t\tdate={self.date}\n'
-            # f'\t\tdescription={self.description}\n'
-            # f'\t\turl={self.url}\n'
-            # f'\t\timageURL={self.imageURL}\n'
+            f'\t\tdate={self.date}\n'
+            f'\t\tdescription={self.description}\n'
+            f'\t\turl={self.url}\n'
+            f'\t\timageURL={self.imageURL}\n'
             f'\t\tpublisher={self.publisher}\n'
             f'\t\tcategories={self.categories}\n'
             f'    )'
         )
+
+    def __nonzero__(self):
+        return bool(self.title and self.date and self.description and self.url and self.imageURL and self.publisher and self.categories)

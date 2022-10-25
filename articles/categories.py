@@ -48,3 +48,43 @@ cnn_categories = {
     'entertainment': 'Entertainment',
     'cars': 'Auto',
 }
+
+categories = {
+    'africa': 'World',
+    'americas': 'World',
+    'asia': 'World',
+    'australia': 'World',
+    'auto': 'Auto',
+    'business': 'Business',
+    'cars': 'Auto',
+    'china': 'World',
+    'economy': 'Business',
+    'energy': 'World',
+    'entertainment': 'Entertainment',
+    'europe': 'World',
+    'food-drink': 'Lifestyle',
+    'great-outdoors': 'Lifestyle',
+    'health': 'Lifestyle',
+    'homes': 'Business',
+    'india': 'World',
+    'investing': 'Business',
+    'lifestyle': 'Lifestyle',
+    'media': 'World',
+    'middleeast': 'World',
+    'opinions': 'World',
+    'perspectives': 'Business',
+    'politics': 'Politics',
+    'science': 'Science/Tech',
+    'sports': 'Sports',
+    'style': 'Lifestyle',
+    'style-and-beauty': 'Lifestyle',
+    'success': 'Business',
+    'tech': 'Science/Tech',
+    'travel': 'Lifestyle',
+    'uk': 'World',
+    'us': 'US News',
+    'weather': 'World',
+    'world': 'World'
+ }
+
+# total = {**cnn_categories, **fox_categories}
