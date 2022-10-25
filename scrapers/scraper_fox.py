@@ -11,12 +11,9 @@ class scraper_fox(Scraper):
         # if meta_data_dict['dc.date']:
         #    return meta_data_dict['dc.date']
         if article.meta_data['dc.date']:
-            try:
-                return self.extractDate(article.meta_data['dc.date'])
+            return self.extractDate(article.meta_data['dc.date'])
         # datetime_str = str(datetime.fromisoformat(article.meta_data['article']['published_time']))
         # return datetime_str
-            except:
-                pass
         return super().getDate(article)
 
     # getText needs a little work - effects keyword extraction

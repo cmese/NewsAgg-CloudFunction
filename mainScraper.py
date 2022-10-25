@@ -6,7 +6,7 @@ from newspaper import Config
 from scrapers.scraper_cnn import scraper_cnn
 import pprint
 from scrapers.scraper_fox import scraper_fox
-#from scraper_cnbc import scraper_cnbc
+from scrapers.scraper_cnbc import scraper_cnbc
 #from scraper_nyt import scraper_nyt
 
 # from .Article import Article
@@ -17,9 +17,9 @@ from articles.Article import Article  # for testing seperately
 
 def getNewArticles():
     articles = []
-    scraper_objs = [# scraper_cnn
-                    scraper_fox]
-                    # scraper_cnbc,
+    scraper_objs = [scraper_cnn,
+                    scraper_fox,
+                    scraper_cnbc]
                     # scraper_nyt]
     scraper_objs_built = [scraper() for scraper in scraper_objs]
     papers = [paper.built_site for paper in scraper_objs_built]
@@ -53,6 +53,7 @@ def scrape(scraper_objs_built):
             except:
                 pass
     # return [*set(articles)]
+    print(len(articles))
     return articles
 
 #final = scrape()

@@ -21,12 +21,9 @@ class scraper_cnn(Scraper):
     #TODO: convert to dateutil
     def getDate(self, article):
         if article.meta_data['pubdate']:
-            try:
-                return self.extractDate(article.meta_data['pubdate'])
+            return self.extractDate(article.meta_data['pubdate'])
                 # datetime_str = str(datetime.strptime(article.meta_data['pubdate'], '%Y-%m-%dT%H:%M:%SZ'))
                 # return datetime_str
-            except:
-                pass
         return super().getDate(article) # returns '' if found nothing
 
 #scraper = scraper_cnn()

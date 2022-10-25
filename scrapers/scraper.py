@@ -3,7 +3,6 @@ import os
 import tempfile
 import pprint
 import nltk
-from datetime import datetime
 from articles.categories import categories
 from dateutil import parser
 
