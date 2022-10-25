@@ -5,7 +5,7 @@ from newspaper import news_pool
 from newspaper import Config
 from scrapers.scraper_cnn import scraper_cnn
 import pprint
-#from scraper_fox import scraper_fox
+from scrapers.scraper_fox import scraper_fox
 #from scraper_cnbc import scraper_cnbc
 #from scraper_nyt import scraper_nyt
 
@@ -15,10 +15,10 @@ from articles.Article import Article  # for testing seperately
 # from .cnnScraper import getCNNArticles
 # from . import cnnScraper, foxScraper, nytScraper
 
-def scrape():
+def getNewArticles():
     articles = []
-    scraper_objs = [scraper_cnn]
-                    # scraper_fox,
+    scraper_objs = [# scraper_cnn
+                    scraper_fox]
                     # scraper_cnbc,
                     # scraper_nyt]
     scraper_objs_built = [scraper() for scraper in scraper_objs]
@@ -26,7 +26,9 @@ def scrape():
     print([paper.size() for paper in papers])
     news_pool.set(papers, threads_per_source=2) # 4 papers * 2 threads = 8 threads total
     news_pool.join()
+    return scrape(scraper_objs_built)
 
+def scrape(scraper_objs_built):
     articles = []
     # at this point, every article has been downloaded
     for scraper in scraper_objs_built:
@@ -53,6 +55,6 @@ def scrape():
     # return [*set(articles)]
     return articles
 
-final = scrape()
-pprint.pprint(final)
-print(len(final))
+#final = scrape()
+#pprint.pprint(final)
+#print(len(final))

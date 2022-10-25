@@ -84,7 +84,11 @@ categories = {
     'uk': 'World',
     'us': 'US News',
     'weather': 'World',
-    'world': 'World'
+    'world': 'World',
+    'russia': 'World',
+    'ukraine': 'World',
+    'war': 'Politics',
+    'fight': 'Politics'
  }
 
 # total = {**cnn_categories, **fox_categories}

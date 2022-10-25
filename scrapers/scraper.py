@@ -66,6 +66,9 @@ class Scraper:
     def getTitle(self, article):
         return article.title
 
+    def getText(self, article):
+        return article.text.replace('\n', '')
+
     def getDate(self, article):
         if article.publish_date:
             # return article.publish_date
@@ -97,7 +100,7 @@ class Scraper:
     # https://github.com/johnbumgarner/newspaper3_usage_overview
     # nltk example usage: https://github.com/johnbumgarner/newspaper3_usage_overview
     def getKeywords(self, article):
-        article_text = article.text.replace('\n', '')
+        article_text = self.getText(article)
         article_description = self.getDescription(article)
         article_title = self.getTitle(article)
 

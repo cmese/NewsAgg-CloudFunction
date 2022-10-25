@@ -12,8 +12,8 @@
 
 # scraper_objs = [
 #     scraper_cnn('cnn', 'http://cnn.com'),
-#     scraper_fox('cnbc', 'http://www.cnbc.com'),
-#     scraper_cnbc('fox', 'http://www.foxnews.com'),
+#     scraper_cnbc('cnbc', 'http://www.cnbc.com'),
+#     scraper_fox('fox', 'http://www.foxnews.com'),
 #     scraper_nyt('nyt', 'http://nytimes.com'),
 # ]
 
