@@ -5,7 +5,7 @@ import pprint
 import nltk
 from datetime import datetime
 from articles.categories import categories
-
+from dateutil import parser
 
 # for running seperately
 import sys
@@ -74,6 +74,10 @@ class Scraper:
             # return article.publish_date
             return str(article.publish_date)
         return ''
+
+    def extractDate(self, date_string):
+        article_date = parser.parse(date_string)
+        return str(article_date)
 
     def getDescription(self, article):
         return article.meta_description

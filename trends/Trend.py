@@ -1,9 +1,9 @@
-#TODO:convert to data class 
+#TODO:convert to data class
 #Trend class
 from articles.Article import Article
 
 class Trend(object):
-    def __init__(self, name, categories, articles=[]): #TODO: default empty list can cause weird errors, change this 
+    def __init__(self, name, categories, articles=[]): #TODO: default empty list can cause weird errors, change this
         self.name = name
         self.categories = categories
         self.articles = articles

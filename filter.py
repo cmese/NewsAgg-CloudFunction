@@ -63,5 +63,5 @@ def filterString(raw_string):
     # print(no_sw_string)
     # print("-----------")
     # filtered_string = lematizer(no_sw_string)
-    # TODO: Remove non alpha words?  
+    # TODO: Remove non alpha words?
     return no_sw_string
