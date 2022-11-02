@@ -23,6 +23,8 @@ class Trend(object):
         return dest
 
     def __eq__(self, other):
+        if self or other is None:
+            return False
         return self.name == other.name and self.articles == other.articles
 
     def __repr__(self):

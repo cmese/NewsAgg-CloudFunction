@@ -29,7 +29,7 @@ def getNewArticles():
     news_pool.set(papers, threads_per_source=2) # 4 papers * 2 threads = 8 threads total
     news_pool.join()
     # tasks = []
-    for built_scraper in scraper_objs_built:
+    # for built_scraper in scraper_objs_built:
     #     tasks.append(scrape(built_scraper))
     # results = await asyncio.gather(*tasks)
     # for result in results:

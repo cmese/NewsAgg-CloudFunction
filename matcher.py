@@ -27,8 +27,6 @@ def match(articles, trends):
             result_list.append(matched_trend)
     return result_list
 
-def match2(article, trends):
-    
 
 # takes all article categories from article list
 # and converts it to either sports, politics, business, health
