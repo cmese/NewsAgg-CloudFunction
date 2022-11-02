@@ -54,5 +54,5 @@ class Article(object):
             f'    )'
         )
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.title and self.date and self.description and self.url and self.imageURL and self.publisher and self.categories)

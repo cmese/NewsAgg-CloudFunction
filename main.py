@@ -3,6 +3,7 @@ from trends.gTrends import getDailyTrends
 from mainScraper import scrape
 from matcher import match
 from trends.Trend import Trend
+from genScraper import genScraper
 # from scraperURLs import urlDic
 
 # This os import solves weird DNS error:
@@ -49,6 +50,9 @@ def main():
         trends_agg = TrendsAgg.from_dict(doc_dict)
         last500_list = trends_agg.last500
         # last500_list = doc_dict['last500']
+        # ----------------------------------------
+        genScraper()
+        # ----------------------------------------
         articles = scrape()
         if last500_list and articles:
             # print("Last500_list before anything happens:\n", last500_list)

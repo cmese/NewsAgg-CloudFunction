@@ -8,7 +8,7 @@ from scrapers.scraper_fox import scraper_fox
 from scrapers.scraper_cnbc import scraper_cnbc
 #from scraper_nyt import scraper_nyt
 
-import asyncio
+# import asyncio
 import pprint
 # from .Article import Article
 from articles.Article import Article  # for testing seperately
@@ -16,8 +16,9 @@ from articles.Article import Article  # for testing seperately
 # from .cnnScraper import getCNNArticles
 # from . import cnnScraper, foxScraper, nytScraper
 
-async def getNewArticles():
-    articles = []
+#async def getNewArticles():
+def getNewArticles():
+    articles = list()
     scraper_objs = [scraper_cnn,
                     scraper_fox,
                     scraper_cnbc]
@@ -27,18 +28,19 @@ async def getNewArticles():
     print([paper.size() for paper in papers])
     news_pool.set(papers, threads_per_source=2) # 4 papers * 2 threads = 8 threads total
     news_pool.join()
-    tasks = []
+    # tasks = []
     for built_scraper in scraper_objs_built:
-        tasks.append(scrape(built_scraper))
-    results = await asyncio.gather(*tasks)
-    for result in results:
-        articles = articles + result
+    #     tasks.append(scrape(built_scraper))
+    # results = await asyncio.gather(*tasks)
+    # for result in results:
+    #     articles = articles + result
     pprint.pprint(articles)
     return articles
     #return scrape(scraper_objs_built)
 
-async def scrape(scraper):
-    articles = []
+#async def scrape(scraper):
+def scrape(scraper):
+    # articles = list()
     # at this point, every article has been downloaded
     for article_extract in scraper.built_site.articles:
         article_extract.parse()
