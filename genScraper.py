@@ -65,6 +65,18 @@ def genScraper():
 
 
 
+def add_to_last500(matched_list, trends_dic, fs_trends_list):
+    for matched_trend in matched_list:
+        if trends_dic[matched_trend.name][0] is None: # brand new trend
+            fs_trends_list.insert(0, matched_trend)
+        elif trends_dic[matched_trend.name][0] != matched_trend: #previous trend with new articles
+            fs_trends_list.pop(
+                    fs_trends_list.index(trends_dic[matched_trend.name]))
+            fs_trends_list.insert(0, matched_trend)
+        if len(fs_trends_list) > 500:
+            fs_trends_list = fs_trends_list[:-1]
+    return fs_trends_list
+
 
 def match_article_to_trends(article_obj, trends_dic):
     matched_list = []
