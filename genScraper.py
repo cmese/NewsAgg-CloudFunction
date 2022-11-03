@@ -37,9 +37,9 @@ class TrendsAgg(object):
         )
 
 
-def genScraper(doc_dict):
+def genScraper(trends_agg):
     trends_dic = {}
-    fs_trends_list = getLatestTrendsList(doc_dict)
+    fs_trends_list = getLatestTrendsList(trends_agg)
     for trend in fs_trends_list:
         trends_dic[trend.name] = [trend, filterString(trend.name)]
     for trend in getDailyTrends():
@@ -101,8 +101,7 @@ def update_trends_dic(trends_dic, new_trend):
     trends_dic[new_trend.name] = [new_trend, trends_dic[new_trend.name][1]]
 
 # gets a list of the latest trends stored on firestore
-def getLatestTrendsList(doc_dict):
-    trends_agg = TrendsAgg.from_dict(doc_dict)
+def getLatestTrendsList(trends_agg):
     last500_list = trends_agg.last500
     return last500_list
 

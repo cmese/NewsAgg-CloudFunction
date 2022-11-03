@@ -1,5 +1,6 @@
 from google.cloud import firestore
 from genScraper import genScraper
+from genScraper import TrendsAgg
 # from scraperURLs import urlDic
 import pprint
 # This os import solves weird DNS error:
@@ -15,11 +16,14 @@ def main():
     doc_dict = trendsAgg_doc_ref.get().to_dict()
 
     if doc_dict:
-        pprint.pprint(doc_dict)
         print("scraping and matching......")
-        new_list = genScraper(doc_dict)
-        print(new_list)
-        print(len(new_list))
+        trends_agg = TrendsAgg.from_dict(doc_dict)
+        trends_agg.last500 = genScraper(trends_agg)
+        trends_agg = trends_agg.to_dict()
+        # trendsAgg_doc_ref.set(trends_agg.to_dict())
+        print('----------------------------------------')
+        pprint.pprint(trends_agg)
+        print(len(trends_agg['last500']))
     else:
         print("Error: doc_dict is blank")
 
