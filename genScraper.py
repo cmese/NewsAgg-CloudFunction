@@ -73,16 +73,8 @@ def add_to_last500(matched_list, trends_dic, fs_trends_list):
             fs_trends_list.pop(
                         fs_trends_list.index(trends_dic[matched_trend.name][0]))
         fs_trends_list.insert(0, matched_trend)
+        update_trends_dic(trends_dic, matched_trend)
 
-'''
-        if trends_dic[matched_trend.name][0] is None: # brand new trend
-            fs_trends_list.insert(0, matched_trend)
-        elif trends_dic[matched_trend.name][0] != matched_trend: #previous trend with new articles
-            if trends_dic[matched_trend.name][0] in fs_trends_list:
-                fs_trends_list.pop(
-                        fs_trends_list.index(trends_dic[matched_trend.name][0]))
-                fs_trends_list.insert(0, matched_trend)
-'''
 
 def match_article_to_trends(article_obj, trends_dic):
     matched_list = []
@@ -92,17 +84,21 @@ def match_article_to_trends(article_obj, trends_dic):
         if jacScore > 0:
             # value[0].articles.append(article_obj)
             # value[0].categories = combineCategories(value[0].articles)
-            old_articles = []
-            if value[0]: # old trend match
-                old_articles = value[0].articles[:]
-                new_trend = Trend(name=key, categories=article_obj.categories.union(value[0].categories), articles=old_articles.insert(0, article_obj))
-                matched_list.append(new_trend)
-            else: # new google trend match
-                new_trend = Trend(name=key, categories=article_obj.categories, articles=article_obj)
-                matched_list.append(new_trend)
+            new_articles = []
+            old_categories = set()
+            if value[0]: # if trend object exists
+                # if value[0].articles: # if old trend
+                new_articles = value[0].articles[:]
+                old_categories = value[0].categories
+            if article_obj not in new_articles:
+                new_articles.insert(0, article_obj)
+            new_trend = Trend(name=key, categories=article_obj.categories.union(old_categories), articles=new_articles)
+            matched_list.append(new_trend)
     pprint.pprint(matched_list)
     return matched_list
 
+def update_trends_dic(trends_dic, new_trend):
+    trends_dic[new_trend.name] = [new_trend, trends_dic[new_trend.name][1]]
 
 # gets a list of the latest trends stored on firestore
 def getLatestTrendsList(doc_dict):

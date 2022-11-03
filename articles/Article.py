@@ -36,7 +36,7 @@ class Article(object):
         return dest
 
     def __eq__(self, other):
-        return self.url == other.url
+        return self.title == other.title and self.publisher == other.publisher
 
     def __hash__(self):
         return id(self)

@@ -1,11 +1,7 @@
 from google.cloud import firestore
-from trends.gTrends import getDailyTrends
-from mainScraper import scrape
-from matcher import match
-from trends.Trend import Trend
 from genScraper import genScraper
 # from scraperURLs import urlDic
-
+import pprint
 # This os import solves weird DNS error:
 '''
 google.api_core.exceptions.RetryError: Deadline of 300.0s exceeded while calling target function, last exception: 503 DNS resolution failed for firestore.googleapis.com: C-ares status is not ARES_SUCCESS qtype=AAAA name=firestore.googleapis.com is_balancer=0: Could not contact DNS servers
@@ -13,38 +9,13 @@ google.api_core.exceptions.RetryError: Deadline of 300.0s exceeded while calling
 import os
 os.environ['GRPC_DNS_RESOLVER'] = 'native'
 
-'''
-class TrendsAgg(object):
-    def __init__(self, last500=[]):
-        self.last500 = last500
-
-    @staticmethod
-    def from_dict(source):
-        last500_object_list = [Trend.from_dict(
-            trend) for trend in source[u'last500']]
-        return TrendsAgg(last500_object_list)
-
-    def to_dict(self):
-        last500_dict_list = [trend.to_dict() for trend in self.last500]
-        dest = {
-            u'last500': last500_dict_list
-        }
-        return dest
-
-    def __repr__(self):
-        return(
-            f'\nLAST500(\n'
-            f' {self.last500}\n'
-            f')'
-        )
-'''
-
 def main():
     db = firestore.Client()
     trendsAgg_doc_ref = db.collection(u'trendsAgg').document(u'recentTrends')
     doc_dict = trendsAgg_doc_ref.get().to_dict()
 
     if doc_dict:
+        pprint.pprint(doc_dict)
         print("scraping and matching......")
         new_list = genScraper(doc_dict)
         print(new_list)
