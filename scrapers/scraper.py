@@ -57,7 +57,7 @@ class Scraper:
         return self.publisher
 
     def getSiteURL(self):
-        return self.url
+        return self.base_url
 
     def getArticleURL(self, article):
         return article.url

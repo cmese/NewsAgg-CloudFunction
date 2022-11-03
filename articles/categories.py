@@ -1,3 +1,5 @@
+#TODO: category generator
+
 fox_categories = {
     'world': 'World',
     'weather': 'World',
@@ -55,10 +57,13 @@ categories = {
     'asia': 'World',
     'australia': 'World',
     'auto': 'Auto',
+    'biden': 'Politics',
     'business': 'Business',
     'cars': 'Auto',
     'china': 'World',
     'economy': 'Business',
+    'election': 'Politics',
+    'elections': 'Politics',
     'energy': 'World',
     'entertainment': 'Entertainment',
     'europe': 'World',
@@ -71,6 +76,7 @@ categories = {
     'lifestyle': 'Lifestyle',
     'media': 'World',
     'middleeast': 'World',
+    'midterm': 'Politics',
     'opinions': 'World',
     'perspectives': 'Business',
     'politics': 'Politics',
@@ -81,6 +87,7 @@ categories = {
     'success': 'Business',
     'tech': 'Science/Tech',
     'travel': 'Lifestyle',
+    'trump': 'Politics',
     'uk': 'World',
     'us': 'US News',
     'weather': 'World',

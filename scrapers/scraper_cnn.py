@@ -1,6 +1,4 @@
 from scrapers.scraper import Scraper
-from datetime import datetime
-from dateutil import parser
 
 
 class scraper_cnn(Scraper):
