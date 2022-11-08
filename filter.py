@@ -25,7 +25,6 @@ def removeStopWords(words):
 def removePunc(words):
     return [word for word in words if word.isalnum()]
 
-#unused for now
 def removeNonAlpha(words):
     return [word for word in words if word.isalpha()]
 
@@ -60,8 +59,10 @@ def filterString(raw_string):
     # print(no_punc_string)
     # print("-----------")
     no_sw_string = removeStopWords(no_punc_string)
+
+    no_num_string = removeNonAlpha(no_sw_string)
     # print(no_sw_string)
     # print("-----------")
     # filtered_string = lematizer(no_sw_string)
     # TODO: Remove non alpha words?
-    return no_sw_string
+    return no_num_string
