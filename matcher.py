@@ -9,14 +9,12 @@ from trends.gTrends import getDailyTrends
 from filter import filterString
 from sim_scorers import getJaccardScore
 
-from newspaper import news_pool
-# from google.cloud import firestore
 
-import pprint
-import gc
-
-
+# fetches latest trends cached in cloud firestore and google
+# builds and fetches articles from all news sites and matches
+# them to trends one by one. Returns the updated agg list
 def update_articles_trends(trends_agg):
+    # combine latest trends from firestore and google into trends dictionary
     trends_dic = {}
     fs_trends_list = getLatestTrendsList(trends_agg)
     for trend in fs_trends_list:
@@ -29,14 +27,12 @@ def update_articles_trends(trends_agg):
                     scraper_cnn,
                     scraper_fox,
                     scraper_cnbc]
+    # initialize a news site's scraper object
+    # this also builds the site with newspaper3k
     scraper_objs_built = (scraper() for scraper in scraper_objs)
-    # papers = [paper.built_site for paper in scraper_objs_built]
-    # print([scraper.built_site.size() for scraper in scraper_objs_built])
-    # print([paper.size() for paper in papers])
-    # news_pool.set(papers, threads_per_source=2) # 4 papers * 2 threads = 8 threads total
-    # news_pool.join()
 
-    # at this point, every article has been downloaded
+    # for each built site's scraper object, scrape each article and try to
+    # match it
     counter = 0
     for scraper in scraper_objs_built:
         article_gen = (scrape(scraper, article) for article in scraper.built_site.articles)
@@ -45,16 +41,29 @@ def update_articles_trends(trends_agg):
                 # try to match it
                 counter = counter + 1
                 match_article_to_trends(article_obj, trends_dic, fs_trends_list, counter)
-                # add_to_last500(matched_list, trends_dic, fs_trends_list)
-            #--del article_obj
-        #--del scraper
-        #--gc.collect()
     print("Done matching articles")
+
+    # trim updated agg list if trend objects > 500
     if len(fs_trends_list) > 500:
         fs_trends_list = fs_trends_list[:-1]
     return fs_trends_list
 
 
+# tries to match an article to each of the trends in the current trends_dic one by one
+# for each match found, update the aggregated trends list with the new trend found
+def match_article_to_trends(article_obj, trends_dic, fs_trends_list, counter):
+    print(f"Trying to match article {counter}: PUBLISHER={article_obj.publisher}...TITLE={article_obj.title}")
+    trends_dic_copy = trends_dic.copy()
+    match_gen = (get_updated_match(article_obj, trends_dic_copy, key) for key in trends_dic_copy.keys())
+    for match in match_gen:
+        if match:
+            print(f"MATCHED article {counter}: PUBLISHER={article_obj.publisher}...TITLE={article_obj.title}...TREND={match.name}")
+            add_to_last500(match, trends_dic, fs_trends_list)
+
+
+# if the matched trend already exists in the aggregated trends list, pop it and
+# insert the updated trend object at the front. Updates trends dic before the next
+# article / trend match check
 def add_to_last500(matched_trend, trends_dic, fs_trends_list):
     if trends_dic[matched_trend.name][0] in fs_trends_list:
         i = fs_trends_list.index(trends_dic[matched_trend.name][0])
@@ -62,45 +71,34 @@ def add_to_last500(matched_trend, trends_dic, fs_trends_list):
     fs_trends_list.insert(0, matched_trend)
     update_trends_dic(trends_dic, matched_trend)
     print(f"updated last500_list with trend: {matched_trend.name}")
-    #--return
 
 
-def match_article_to_trends(article_obj, trends_dic, fs_trends_list, counter):
-    print(f"articles checked: {counter}")
-    trends_dic_copy = trends_dic.copy()
-    match_gen = (get_updated_match(article_obj, trends_dic_copy, key) for key in trends_dic_copy.keys())
-    for match in match_gen:
-        if match:
-            add_to_last500(match, trends_dic, fs_trends_list)
-    #--del trends_dic_copy
-    #--return
-
-
-# matches article to trend and returns updated trend if matched
+# matches article to trend and returns new trend object with article if matched
 def get_updated_match(article_obj, trend_dic_copy, key):
+    # compare article tokens and trend tokens
     article_tokens = filterString(article_obj.title)
     trend_tokens = trend_dic_copy[key][1]
     jacScore = getJaccardScore(article_tokens, trend_tokens)
-    if jacScore > 0:
-        # value[0].articles.append(article_obj)
-        # value[0].categories = combineCategories(value[0].articles)
+    if jacScore > 0: # if match
         new_articles = []
         old_categories = set()
+        # if trend object exists, copy old articles list and categories set
         if trend_dic_copy[key][0]:  # if trend object exists
-            # if value[0].articles: # if old trend
             new_articles = trend_dic_copy[key][0].articles[:]
             old_categories = trend_dic_copy[key][0].categories
-        if article_obj not in new_articles:
+        # append new article to old articles list in the front
+        if article_obj not in new_articles: # prevents duplicate articles in trend object
             new_articles.insert(0, article_obj)
+        # combine categories sets and create new trend with new categories set and new articles list
         new_trend = Trend(name=key, categories=article_obj.categories.union(old_categories), articles=new_articles)
-        # pprint.pprint(new_trend)
         return new_trend
-    #--return
 
+
+# updates trends dict with the updated trend
 def update_trends_dic(trends_dic, new_trend):
     trend_filtered_string = trends_dic[new_trend.name][1]
     trends_dic[new_trend.name] = [new_trend, trend_filtered_string]
-    #--return
+
 
 # gets a list of the latest trends stored on firestore
 def getLatestTrendsList(trends_agg):
@@ -108,6 +106,9 @@ def getLatestTrendsList(trends_agg):
     return last500_list
 
 
+# downloads and parses an article extract
+# scrapes the required attributes into an article dictionary
+# if all attributes are found, an article object is created and returned
 def scrape(scraper, article_extract):
     article = {}
     try:
@@ -121,7 +122,6 @@ def scrape(scraper, article_extract):
         article["description"] = scraper.getDescription(article_extract)
         article["imageURL"] = scraper.getImageURL(article_extract)
         article["categories"] = scraper.getCategories(article_extract)
-        #--del article_extract
         return Article.from_dict(article)  # to article object
     except:
         pass
