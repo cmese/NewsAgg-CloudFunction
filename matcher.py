@@ -44,8 +44,7 @@ def update_articles_trends(trends_agg):
     print("Done matching articles")
 
     # trim updated agg list if trend objects > 500
-    if len(fs_trends_list) > 500:
-        fs_trends_list = fs_trends_list[:-1]
+    fs_trends_list = fs_trends_list[:500]
     return fs_trends_list
 
 
@@ -89,6 +88,7 @@ def get_updated_match(article_obj, trend_dic_copy, key):
         # append new article to old articles list in the front
         if article_obj not in new_articles: # prevents duplicate articles in trend object
             new_articles.insert(0, article_obj)
+            new_articles = new_articles[:10]
         # combine categories sets and create new trend with new categories set and new articles list
         new_trend = Trend(name=key, categories=article_obj.categories.union(old_categories), articles=new_articles)
         return new_trend

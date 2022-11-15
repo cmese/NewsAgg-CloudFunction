@@ -18,22 +18,24 @@ def main():
     trendsAgg_doc_ref = db.collection(u'trendsAgg').document(u'recentTrends')
     doc_dict = trendsAgg_doc_ref.get().to_dict()
 
+    if not doc_dict:
+        print("doc_dict is blank")
+        doc_dict = {}
+
     print("Starting scraper and matcher......")
-    if doc_dict:
-        trends_agg = TrendsAgg.from_dict(doc_dict)
-        print(f"Total trends in current aggregator: {len(trends_agg.last500)}")
 
-        # update trends_agg last500 list
-        trends_agg.last500 = update_articles_trends(trends_agg)
-        trends_agg = trends_agg.to_dict()
-        print("Updated Trends Agg: ")
-        pprint.pprint(trends_agg)
-        print(f"Total trends in updated aggregator: {len(trends_agg['last500'])}")
+    trends_agg = TrendsAgg.from_dict(doc_dict)
+    print(f"Total trends in current aggregator: {len(trends_agg.last500)}")
 
-        # update cloud firestore document with new agg list
-        trendsAgg_doc_ref.set(trends_agg)
-    else:
-        print("Error: doc_dict is blank")
+    # update trends_agg last500 list
+    trends_agg.last500 = update_articles_trends(trends_agg)
+    trends_agg = trends_agg.to_dict()
+    print("Updated Trends Agg: ")
+    pprint.pprint(trends_agg)
+    print(f"Total trends in updated aggregator: {len(trends_agg['last500'])}")
+
+    # update cloud firestore document with new agg list
+    trendsAgg_doc_ref.set(trends_agg)
 
 
 if __name__ == "__main__":
