@@ -95,7 +95,7 @@ categories = {
     'russia': 'World',
     'ukraine': 'World',
     'war': 'Politics',
-    'fight': 'Politics'
+    'fight': 'Politics',
  }
 
 # total = {**cnn_categories, **fox_categories}

@@ -1,7 +1,8 @@
 from google.cloud import firestore
-from matcher import update_articles_trends
+from matcher import update_articles_trends_2
 from TrendsAgg import TrendsAgg
 import pprint
+import pandas as pd
 import gc
 
 # This os import solves weird DNS error:
@@ -18,24 +19,32 @@ def main():
     trendsAgg_doc_ref = db.collection(u'trendsAgg').document(u'recentTrends')
     doc_dict = trendsAgg_doc_ref.get().to_dict()
 
+    # doc_dict = 
+    #   { last500 : [] }
+
     if not doc_dict:
         print("doc_dict is blank")
         doc_dict = {}
 
     print("Starting scraper and matcher......")
 
-    trends_agg = TrendsAgg.from_dict(doc_dict)
-    print(f"Total trends in current aggregator: {len(trends_agg.last500)}")
+    last500_list = doc_dict['last500']
+
+    #trends_agg = TrendsAgg.from_dict(doc_dict)
+    #print(f"Total trends in current aggregator: {len(trends_agg.last500)}")
 
     # update trends_agg last500 list
-    trends_agg.last500 = update_articles_trends(trends_agg)
-    trends_agg = trends_agg.to_dict()
-    print("Updated Trends Agg: ")
-    pprint.pprint(trends_agg)
-    print(f"Total trends in updated aggregator: {len(trends_agg['last500'])}")
+    ### trends_agg.last500 = update_articles_trends(trends_agg)
+    
+    new_trends_agg = { 'last500' : update_articles_trends_2(last500_list) }
+
+
+    #print("Updated Trends Agg: ")
+    #pprint.pprint(new_trends_agg)
+    #print(f"Total trends in updated aggregator: {len(new_trends_agg['last500'])}")
 
     # update cloud firestore document with new agg list
-    trendsAgg_doc_ref.set(trends_agg)
+    # trendsAgg_doc_ref.set(new_trends_agg)
 
 
 if __name__ == "__main__":

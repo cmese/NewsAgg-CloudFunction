@@ -6,8 +6,142 @@ from scrapers.scraper_nyt import scraper_nyt
 from articles.Article import Article
 from trends.Trend import Trend
 from trends.gTrends import getDailyTrends
-from filter import filterString
+from filter import filterString2, filter_string3, process_text
 from sim_scorers import getJaccardScore
+from collections import OrderedDict, deque
+
+import yake
+from articles.categories import categories
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+import pprint
+import pandas as pd
+
+kw_extractor = yake.KeywordExtractor()
+omit_columns = ['text', 'processed_text']
+
+def update_articles_trends_2(prev_trends_array):
+
+    ###################################################################################
+    #deq_trends = deque(prev_trends_array) # for popping / pushing newest stuff back to the front of the list
+    print(len(prev_trends_array))
+    for i in range(5):
+        pprint.pprint(prev_trends_array[i])
+
+    trends_feed_ordered_dict = OrderedDict([(trend['name'], trend) for trend in prev_trends_array])
+    #pprint.pprint(trends_feed_ordered_dict)
+
+    current_trends_keywords = list(OrderedDict.fromkeys([trend['name'] for trend in prev_trends_array] + [trend_string for trend_string in getDailyTrends()])) # need to maintain order for keyword_indices array below
+    processed_keywords_list = [filterString2(keyword) for keyword in current_trends_keywords]
+
+    #scraper_objs = [scraper_fox]
+    scraper_objs = [scraper_nyt,
+                    scraper_cnn,
+                    scraper_fox,
+                    scraper_cnbc]
+    # initialize a news site's scraper object
+    # this also builds the site with newspaper3k
+    scraper_objs_built = [scraper() for scraper in scraper_objs]
+    for scraper in scraper_objs_built:
+        print("ARTICLES #: ", scraper.built_site.size())
+
+    # for each built site's scraper object, scrape each article
+    for scraper in scraper_objs_built:
+        scraped_articles_list = []
+        #df_articles = pd.DataFrame(columns=['publisher', 'url', 'title', 'date', 'description', 'text', 'imageURL', 'categories'])
+        for article in scraper.built_site.articles:
+            scrape2(scraper, article, scraped_articles_list)
+        
+        if len(scraped_articles_list) == 0:
+            print("ZERO scraped articles from ", scraper.publisher)
+            break
+
+        #scraped articles list should be populated now, convert to dataframe
+        df_articles = pd.DataFrame(scraped_articles_list)
+        print(df_articles)
+
+        # process articles, remove stopwords, punc, etc
+        df_articles['processed_text'] = df_articles.apply(process_text, axis=1)
+
+        # vectorize the articles with TF-IDF
+        vectorizer = TfidfVectorizer(stop_words=None, max_df=0.5, min_df=2, max_features=1000)
+        X = vectorizer.fit_transform(df_articles['processed_text'])
+
+
+        # cosine similarity between each processed article vector and the trend keyword vector
+        keyword_vector = vectorizer.transform(processed_keywords_list)
+        similarities = cosine_similarity(X, keyword_vector)
+
+        # similarity threshold, any article above this gets added to that trend's article list
+        threshold = 0.25
+        print("******************************SIMS MATRIX********************************")
+        #pprint.pprint(similarities)
+        # loop through keywords and group nonduplicate articles with similarities above the threshold
+        for keyword_index, keyword in enumerate(processed_keywords_list):
+            full_trend_keyword = current_trends_keywords[keyword_index]
+            keyword_sims = similarities[:, keyword_index]
+            sim_article_indices = [index for index, similarity in enumerate(keyword_sims) if similarity > threshold]
+            for article_index in sim_article_indices:
+                new_article_row = df_articles.iloc[article_index]
+                most_important_keywords = kw_extractor.extract_keywords(new_article_row['text'] + new_article_row['description'] + new_article_row['title'])
+                most_important_keywords_list = [filter_string3(keyword[0]) for keyword in most_important_keywords] 
+                article_categories = [categories[x] for x in most_important_keywords_list if x in categories] 
+                
+                new_article = new_article_row.loc[~new_article_row.index.isin(omit_columns)].to_dict()
+                new_article['categories'] = article_categories
+                # if existing trend, push article to the front of the articles list
+                if full_trend_keyword in trends_feed_ordered_dict:
+                    current_articles_list = trends_feed_ordered_dict[full_trend_keyword]['articles']
+                    if not is_duplicate_article(current_articles_list, new_article):
+                        trends_feed_ordered_dict[full_trend_keyword]['articles'].insert(0, new_article)
+                        trends_feed_ordered_dict[full_trend_keyword]['articles'][:10]
+                        trends_feed_ordered_dict.move_to_end(full_trend_keyword, last=False)
+                else:
+                    trends_feed_ordered_dict[full_trend_keyword] = {'name': full_trend_keyword, 'categories': [], 'articles': [new_article]}
+                    trends_feed_ordered_dict.move_to_end(full_trend_keyword, last=False)
+                current_categories = trends_feed_ordered_dict[full_trend_keyword]['categories']
+                trends_feed_ordered_dict[full_trend_keyword]['categories'] = [*set(article_categories + current_categories)]
+                pprint.pprint(trends_feed_ordered_dict[full_trend_keyword]['name'])
+    print("\n------------------------------------------------------------------------\n")
+    print("\n------------------------------------------------------------------------\n")
+    print("\n------------------------------------------------------------------------\n")
+    print("\n------------------------------------------------------------------------\n")
+    print("\n------------------------------------------------------------------------\n")
+    #pprint.pprint(trends_feed_ordered_dict)
+    new_list = list(trends_feed_ordered_dict.values())
+
+    for i in range(5):
+        pprint.pprint(new_list[i])
+    print(len(new_list))
+    return new_list[:500]
+
+
+        # group articles to keywords
+        # for i, row_article in df_articles.iterrows():
+        #     keyword_indices = [index for index, similarity in enumerate(similarities[i]) if similarity > threshold]
+        #     for keyword_index in keyword_indices:
+        #         update_main_list(deq_trends, keyword_index, row_article.to_dict())
+                #trends_dic[keywords_list[keyword_index]].append(article)
+
+
+    #####################################################################################
+
+def is_duplicate_article(articles, new_article):
+    for article in articles:
+        if article['url'] == new_article['url']:
+            return True
+    return False
+        
+
+
+def update_lists(deq_trends, keyword_index, article_dict):
+    updated_trend = deq_trends.pop(keyword_index)
+    updated_trend['articles'].insert(0, article_dict)
+    updated_trend['articles'] = updated_trend['articles'][:10]
+    deq_trends.appendleft(updated_trend)
+    #problem: need to maintain order of deq_trends AND keyword_indices AND similarities columns
 
 
 # fetches latest trends cached in cloud firestore and google
@@ -125,3 +259,24 @@ def scrape(scraper, article_extract):
         return Article.from_dict(article)  # to article object
     except:
         pass
+
+
+def scrape2(scraper, article_extract, scraped_articles_list):
+    article_dic = {}
+    try:
+        article_extract.download()
+        article_extract.parse()
+
+        article_dic["publisher"] = scraper.getPublisher()
+        article_dic["url"] = scraper.getArticleURL(article_extract)
+        article_dic["title"] = scraper.getTitle(article_extract)
+        article_dic["date"] = scraper.getDate(article_extract)
+        article_dic["description"] = scraper.getDescription(article_extract)
+        article_dic["text"] = scraper.getText(article_extract)
+        article_dic["imageURL"] = scraper.getImageURL(article_extract)
+        #article_dic["categories"] = scraper.getCategories(article_extract)
+        scraped_articles_list.append(article_dic)
+    except:
+        pass
+
+
